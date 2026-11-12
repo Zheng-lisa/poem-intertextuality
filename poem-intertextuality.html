@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>元白诗笺 · 白居易 × 元稹 互文对照</title>
+<style>
+/* ===================== 配色（暖橘米白国风） ===================== */
+:root{
+  --bg1:#e9a28a;
+  --bg2:#f8ede0;
+  --paper:#fff9f1;
+  --paper-soft:#fdf3e6;
+  --ink:#43302a;
+  --ink-soft:#7a6658;
+  --line:#e7d3ba;
+  --gold:#c8923f;
+  --gold-deep:#a8742c;
+  --A:#d9a84f;        /* 白居易 暖黄 */
+  --A-soft:#f5e8c9;
+  --B:#5b5a8c;        /* 元稹 紫蓝 */
+  --B-soft:#dcdcea;
+  --shadow:0 6px 22px rgba(120,70,40,.16);
+  --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:"Songti SC","STSong","SimSun","Noto Serif SC",serif;
+  color:var(--ink);
+  background:linear-gradient(165deg,var(--bg1) 0%,var(--bg2) 55%,#fbf3ea 100%);
+  line-height:1.75;
+  min-height:100vh;
+}
+button,input{font-family:inherit}
+ul{list-style:none}
+mark{background:#f3d9a8;color:var(--ink);padding:0 2px;border-radius:3px}
+
+/* ===================== 顶栏 ===================== */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 26px;
+}
+.brand{font-size:21px;font-weight:700;letter-spacing:3px;color:var(--ink)}
+.brand small{font-size:12px;color:var(--ink-soft);font-weight:400;margin-left:10px;letter-spacing:1px}
+.back{
+  border:1px solid var(--line);background:rgba(255,249,241,.7);border-radius:10px;
+  padding:8px 16px;cursor:pointer;color:var(--ink-soft);font-size:14px;
+}
+.back:hover{border-color:var(--gold);color:var(--gold-deep)}
+
+.view{display:none;max-width:1200px;margin:0 auto;padding:18px 20px 60px}
+.view.active{display:block}
+
+/* ===================== 检索页 ===================== */
+.hero{text-align:center;padding:30px 0 26px}
+.hero h1{font-size:32px;letter-spacing:6px;margin-bottom:12px}
+.hero p{color:var(--ink-soft);font-size:15px}
+
+.search-card{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:26px;max-width:880px;margin:0 auto;
+}
+.search-box{display:flex;gap:10px}
+.search-box input[type=text]{
+  flex:1;font-size:16px;padding:13px 16px;border:1px solid var(--line);
+  border-radius:12px;background:#fff;outline:none;
+}
+.search-box input[type=text]:focus{border-color:var(--gold)}
+.btn{border:none;border-radius:12px;padding:13px 24px;font-size:15px;cursor:pointer}
+.btn-primary{background:var(--gold);color:#fff}
+.btn-primary:hover{background:var(--gold-deep)}
+.btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink-soft)}
+
+.filter-group{margin-top:22px}
+.filter-group>.group-title{display:block;font-size:14px;color:var(--ink-soft);margin-bottom:10px;letter-spacing:1px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:7px 16px;font-size:14px;cursor:pointer;background:#fff;user-select:none}
+.chip input{display:none}
+.chip.on{background:var(--B);color:#fff;border-color:var(--B)}
+.chip.word.on{background:var(--gold);border-color:var(--gold)}
+.search-actions{display:flex;gap:12px;margin-top:24px;justify-content:center}
+
+.stats{display:flex;gap:26px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+.stat{text-align:center}
+.stat .num{font-size:26px;font-weight:700;color:var(--gold-deep)}
+.stat .lab{font-size:13px;color:var(--ink-soft)}
+.note{max-width:880px;margin:18px auto 0;font-size:12.5px;color:var(--ink-soft);text-align:center;line-height:1.8}
+
+/* ===================== 对照页：双人物舞台 ===================== */
+.compare-layout{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:10px;position:relative;
+}
+@media (max-width:860px){.compare-layout{grid-template-columns:1fr}}
+
+.side{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px}
+
+/* 立绘主体 */
+.figure{position:relative;width:100%;height:350px;display:flex;align-items:flex-end;justify-content:center}
+.figure::before{
+  content:'';position:absolute;inset:0;z-index:0;
+  background:radial-gradient(ellipse 70% 62% at 50% 44%, rgba(255,247,234,.55), rgba(255,247,234,0) 74%);
+}
+.figure img{
+  position:relative;z-index:1;height:100%;object-fit:contain;object-position:bottom center;display:block;
+}
+
+/* 对话气泡：紧邻人物下方，小三角指向立绘 */
+.bubble{
+  position:relative;z-index:2;max-width:78%;margin-top:-16px;align-self:center;
+  background:rgba(255,249,241,.95);border:1px solid var(--line);border-radius:16px;
+  padding:16px 18px;box-shadow:var(--shadow);backdrop-filter:blur(4px);
+}
+.bubble::after{
+  content:'';position:absolute;top:-9px;left:50%;width:16px;height:16px;background:var(--paper);
+  border-left:1px solid var(--line);border-top:1px solid var(--line);transform:translateX(-50%) rotate(45deg);
+}
+.bubble-line{font-size:19px;letter-spacing:1.5px;margin-bottom:8px}
+.bubble-title{font-size:13px;color:var(--ink-soft)}
+.bubble-score{margin-top:10px;display:flex;align-items:center;gap:10px;font-size:13px}
+.score-chip{border-radius:6px;padding:2px 10px;color:#fff;font-size:12px}
+.score-high{background:var(--gold-deep)}
+.score-mid{background:var(--B)}
+.score-low{background:#a99c8c}
+
+/* 候选列表 */
+.candidates{
+  width:100%;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:14px;display:flex;flex-direction:column;gap:8px;max-height:240px;overflow-y:auto;
+}
+.candidate{
+  border:1px solid var(--line);border-radius:12px;padding:11px 13px;cursor:pointer;background:#fff;
+}
+.candidate:hover{border-color:var(--gold)}
+.candidate.active{border-color:var(--gold);background:var(--paper-soft)}
+.c-line{font-size:15px}
+.c-meta{display:flex;justify-content:space-between;gap:10px;margin-top:4px;font-size:12px;color:var(--ink-soft)}
+
+.relation-bar{
+  grid-column:1 / -1;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 22px;box-shadow:var(--shadow);display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.relation-bar .rel-type{font-size:13px;color:#fff;background:var(--gold);border-radius:6px;padding:4px 12px;white-space:nowrap}
+.relation-bar .rel-note{font-size:14px;color:var(--ink-soft)}
+
+.empty-tip{text-align:center;color:var(--ink-soft);padding:26px 0;font-size:14px}
+
+/* 窄屏：气泡改为静态堆叠 */
+@media (max-width:860px){
+  .figure{height:300px}
+  .bubble{max-width:100%}
+  .bubble::after{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">元白诗笺<small>白居易 × 元稹 · 诗句互文对照</small></div>
+  <button class="back" id="btnBack" type="button">返回检索</button>
+</header>
+
+<!-- ============ 视图一：检索 ============ -->
+<main class="view active" id="viewSearch">
+  <div class="hero">
+    <h1>诗笺互文</h1>
+    <p>检索白居易与元稹诗句之间的呼应、化用与重言，双侧对照浏览</p>
+  </div>
+
+  <div class="search-card">
+    <div class="search-box">
+      <input type="text" id="inputKeyword" placeholder="输入诗句、诗题或字词…" autocomplete="off">
+      <button class="btn btn-primary" id="btnSearch" type="button">检索</button>
+    </div>
+
+    <div class="filter-group">
+      <label class="group-title">常用词（点击直接检索）</label>
+      <div class="chips" id="chipsWords"></div>
+    </div>
+
+    <div class="filter-group">
+      <label class="group-title">互文强度（匹配分值）</label>
+      <div class="chips" id="chipsScore"></div>
+    </div>
+
+    <div class="search-actions">
+      <button class="btn btn-ghost" id="btnReset" type="button">重置条件</button>
+    </div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+</main>
+
+<!-- ============ 视图二：对照 ============ -->
+<main class="view" id="viewCompare">
+  <div class="compare-layout" id="compareLayout"></div>
+</main>
+
+<!-- 预加载立绘，路径以 src 属性声明，便于静态扫描与打包 -->
+<img id="portraitA" src="assets/baijuyi.png" alt="白居易" hidden>
+<img id="portraitB" src="assets/yuanzhen.png" alt="元稹" hidden>
+
+<script src="data.js"></script>
+<script>
+/* =====================================================================
+ * 一、数据与索引
+ * ===================================================================== */
+const DATA = window.POEM_DATA;
+const POETS = (DATA && DATA.poets) || { A:{name:'白居易',label:'唐'}, B:{name:'元稹',label:'唐'} };
+const NODES_A = DATA ? DATA.nodesA : [];   // [title, line]，下标即 id
+const NODES_B = DATA ? DATA.nodesB : [];
+const EDGES = DATA ? DATA.edges : [];      // [aid, bid, score]
+
+const byA = new Map();  // aid -> [{b, s}]
+const byB = new Map();  // bid -> [{a, s}]
+for (const [a, b, s] of EDGES) {
+  if (!byA.has(a)) byA.set(a, []);
+  if (!byB.has(b)) byB.set(b, []);
+  byA.get(a).push({ b, s });
+  byB.get(b).push({ a, s });
+}
+byA.forEach(v => v.sort((x, y) => y.s - x.s));
+byB.forEach(v => v.sort((x, y) => y.s - x.s));
+
+const state = {
+  keyword: '',
+  threshold: 0,          // 0 全部 / 8000 / 9000
+  poolA: new Set(),      // 关键词命中的 A 节点 id
+  poolB: new Set(),
+  activeA: null,
+  activeB: null
+};
+
+const $ = id => document.getElementById(id);
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function hl(text, kw){
+  const safe = escapeHtml(text);
+  if(!kw) return safe;
+  const k = escapeHtml(kw.trim());
+  if(!k) return safe;
+  const i = safe.indexOf(k);
+  return i === -1 ? safe : safe.slice(0,i) + '<mark>' + safe.slice(i,i+k.length) + '</mark>' + safe.slice(i+k.length);
+}
+function scoreClass(s){ return s >= 9000 ? 'score-high' : s >= 8000 ? 'score-mid' : 'score-low'; }
+function scoreLabel(s){ return s >= 9000 ? '高度重合' : s >= 8000 ? '中等关联' : '弱相关'; }
+function pass(s){ return s >= state.threshold; }
+
+/* =====================================================================
+ * 二、检索
+ * ===================================================================== */
+function poolFilter(nodes, kw){
+  const out = new Set();
+  for (let i = 0; i < nodes.length; i++){
+    const [title, line] = nodes[i];
+    if(!kw || title.includes(kw) || line.includes(kw)) out.add(i);
+  }
+  return out;
+}
+
+function firstOf(set){ for (const v of set) return v; return null; }
+
+function runSearch(){
+  const kw = $('inputKeyword').value.trim();
+  state.keyword = kw;
+  state.poolA = poolFilter(NODES_A, kw);
+  state.poolB = poolFilter(NODES_B, kw);
+
+  // 取阈值内、两端均在结果池中的最高分边作为默认配对
+  let best = null;
+  for (const [a, b, s] of EDGES){
+    if (!pass(s)) continue;
+    if (!state.poolA.has(a) || !state.poolB.has(b)) continue;
+    if (!best || s > best[2]) best = [a, b, s];
+  }
+  if (best){
+    state.activeA = best[0]; state.activeB = best[1];
+  } else {
+    state.activeA = firstOf(state.poolA);
+    state.activeB = firstOf(state.poolB);
+  }
+  renderWordChips();
+  renderCompare();
+  showView('viewCompare');
+}
+
+/* =====================================================================
+ * 三、对照页渲染
+ * ===================================================================== */
+function edgeScore(a, b){
+  const list = byA.get(a);
+  if (!list) return null;
+  const hit = list.find(x => x.b === b);
+  return hit ? hit.s : null;
+}
+
+function candidateA(){
+  // 与当前 B 句匹配的 A 句（在 A 池中）
+  const rel = byB.get(state.activeB) || [];
+  return rel.filter(x => pass(x.s) && state.poolA.has(x.a)).slice(0, 60);
+}
+function candidateB(){
+  const rel = byA.get(state.activeA) || [];
+  return rel.filter(x => pass(x.s) && state.poolB.has(x.b)).slice(0, 60);
+}
+
+function panel(side, activeId, candidates, otherNodeList, sideOf){
+  const poet = POETS[side];
+  const nodes = side === 'A' ? NODES_A : NODES_B;
+  const sideEl = document.createElement('section');
+  sideEl.className = 'side ' + side;
+
+  // 立绘主体
+  const img = side === 'A' ? $('portraitA').src : $('portraitB').src;
+  const figure = document.createElement('div');
+  figure.className = 'figure';
+  figure.innerHTML =
+    '<img src="' + img + '" alt="' + escapeHtml(poet.name) + '">';
+  sideEl.appendChild(figure);
+
+  // 浮于人物旁的对话气泡
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  if (activeId == null){
+    bubble.innerHTML = '<p class="empty-tip">本侧暂无匹配诗句</p>';
+  } else {
+    const [title, line] = nodes[activeId];
+    const s = side === 'A' ? edgeScore(activeId, state.activeB) : edgeScore(state.activeA, activeId);
+    bubble.innerHTML =
+      '<p class="bubble-line">' + hl(line, state.keyword) + '</p>' +
+      '<p class="bubble-title">《' + escapeHtml(title) + '》</p>' +
+      (s != null
+        ? '<div class="bubble-score"><span class="score-chip ' + scoreClass(s) + '">' + scoreLabel(s) + ' · ' + s + '</span></div>'
+        : '<div class="bubble-score"><span class="score-chip score-low">暂无直接配对评分</span></div>');
+  }
+  sideEl.appendChild(bubble);
+
+  // 候选列表
+  const list = document.createElement('ul');
+  list.className = 'candidates';
+  if (!candidates.length){
+    list.innerHTML = '<li class="empty-tip">阈值内无关联诗句</li>';
+  } else {
+    candidates.forEach(c => {
+      const nid = sideOf === 'A' ? c.a : c.b;
+      const [title, line] = otherNodeList[nid];
+      const li = document.createElement('li');
+      li.className = 'candidate' + (nid === activeId ? ' active' : '');
+      li.innerHTML =
+        '<div class="c-line">' + hl(line, state.keyword) + '</div>' +
+        '<div class="c-meta"><span>《' + escapeHtml(title) + '》</span>' +
+        '<span class="score-chip ' + scoreClass(c.s) + '">' + c.s + '</span></div>';
+      li.addEventListener('click', () => selectNode(side, nid));
+      list.appendChild(li);
+    });
+  }
+  sideEl.appendChild(list);
+  return sideEl;
+}
+
+function relationBar(){
+  const bar = document.createElement('div');
+  bar.className = 'relation-bar';
+  if (state.activeA == null || state.activeB == null){
+    bar.innerHTML = '<span class="rel-type">互文关系</span><span class="rel-note">当前缺少配对诗句，请在左侧候选中选择。</span>';
+    return bar;
+  }
+  const s = edgeScore(state.activeA, state.activeB);
+  const [aTitle] = NODES_A[state.activeA];
+  const [bTitle] = NODES_B[state.activeB];
+  if (s == null){
+    bar.innerHTML = '<span class="rel-type">互文关系</span><span class="rel-note">当前两句在数据集中无直接配对评分。</span>';
+  } else {
+    bar.innerHTML =
+      '<span class="rel-type">' + scoreLabel(s) + '</span>' +
+      '<span class="rel-note">《' + escapeHtml(aTitle) + '》 ↔ 《' + escapeHtml(bTitle) + '》，配对得分 ' + s + '。</span>';
+  }
+  return bar;
+}
+
+function renderCompare(){
+  const layout = $('compareLayout');
+  layout.innerHTML = '';
+  layout.appendChild(panel('A', state.activeA, candidateA(), NODES_A, 'A'));
+  layout.appendChild(panel('B', state.activeB, candidateB(), NODES_B, 'B'));
+  layout.appendChild(relationBar());
+}
+
+function selectNode(side, id){
+  if (side === 'A'){
+    state.activeA = id;
+    const rel = (byA.get(id) || []).find(x => pass(x.s) && state.poolB.has(x.b));
+    if (rel) state.activeB = rel.b;
+  } else {
+    state.activeB = id;
+    const rel = (byB.get(id) || []).find(x => pass(x.s) && state.poolA.has(x.a));
+    if (rel) state.activeA = rel.a;
+  }
+  renderCompare();
+}
+
+/* =====================================================================
+ * 四、检索页初始化
+ * ===================================================================== */
+const SCORE_OPTIONS = [
+  { v: 0, label: '全部' },
+  { v: 8000, label: '≥ 8000' },
+  { v: 9000, label: '≥ 9000' }
+];
+
+// 取自数据集中高频出现的双字词，均为真实诗句用字
+const COMMON_WORDS = ['平生', '今日', '人间', '千里', '何处', '万里', '白发', '长安', '春风', '相逢', '相见', '一杯'];
+
+function renderWordChips(){
+  const box = $('chipsWords');
+  box.innerHTML = '';
+  COMMON_WORDS.forEach(w => {
+    const chip = document.createElement('span');
+    chip.className = 'chip word' + (state.keyword === w ? ' on' : '');
+    chip.textContent = w;
+    chip.addEventListener('click', () => {
+      $('inputKeyword').value = w;
+      runSearch();
+    });
+    box.appendChild(chip);
+  });
+}
+
+function renderScoreChips(){
+  const box = $('chipsScore');
+  box.innerHTML = '';
+  SCORE_OPTIONS.forEach(opt => {
+    const label = document.createElement('label');
+    label.className = 'chip' + (state.threshold === opt.v ? ' on' : '');
+    label.innerHTML = '<input type="radio" name="score" value="' + opt.v + '">' + escapeHtml(opt.label);
+    label.querySelector('input').addEventListener('change', () => {
+      state.threshold = opt.v;
+      renderScoreChips();
+    });
+    box.appendChild(label);
+  });
+}
+
+function renderStats(){
+  const edgeCount = EDGES.length;
+  $('stats').innerHTML =
+    '<div class="stat"><div class="num">' + NODES_A.length.toLocaleString() + '</div><div class="lab">白居易诗句</div></div>' +
+    '<div class="stat"><div class="num">' + NODES_B.length.toLocaleString() + '</div><div class="lab">元稹诗句</div></div>' +
+    '<div class="stat"><div class="num">' + edgeCount.toLocaleString() + '</div><div class="lab">互文配对</div></div>';
+}
+
+function showView(id){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+$('btnSearch').addEventListener('click', runSearch);
+$('inputKeyword').addEventListener('keydown', e => { if(e.key === 'Enter') runSearch(); });
+$('btnReset').addEventListener('click', () => {
+  state.keyword = ''; state.threshold = 0;
+  $('inputKeyword').value = '';
+  renderScoreChips();
+  renderWordChips();
+});
+$('btnBack').addEventListener('click', () => showView('viewSearch'));
+
+if (!DATA){
+  $('stats').innerHTML = '<p class="empty-tip">未加载到 data.js，请确认数据文件与页面在同一目录。</p>';
+} else {
+  renderScoreChips();
+  renderWordChips();
+  renderStats();
+}
+</script>
+</body>
+</html>

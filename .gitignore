@@ -1,0 +1,10 @@
+# 本地回退备份与早期原型，不纳入仓库
+_backup/
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 系统/编辑器临时文件
+Thumbs.db
+.DS_Store
